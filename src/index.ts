@@ -1,7 +1,26 @@
 import joplin from 'api';
+import { ContentScriptType } from 'api/types';
 
 joplin.plugins.register({
-	onStart: async function() {
-		console.info('Hello world. Test plugin started!');
-	},
+    onStart: async function () {
+        const contentScriptId = "fVim";
+
+        await joplin.contentScripts.register(
+            ContentScriptType.CodeMirrorPlugin,
+            contentScriptId,
+            "./vim-keymap.js"
+        );
+        joplin.contentScripts.onMessage(contentScriptId, (message: string) => {
+            console.info(
+                "PostMessagePlugin (CodeMirror ContentScript): Got message:",
+                message
+            );
+            const response = message + "+responseFromCodeMirrorScriptHandler";
+            console.info(
+                "PostMessagePlugin (CodeMirror ContentScript): Responding with:",
+                response
+            );
+            return response;
+        });
+    },
 });
